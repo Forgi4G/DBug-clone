@@ -12,7 +12,7 @@ module.exports = {
 			family: 4,
 		};
 
-		mongoose.connect(process.env.MONGODB_URI, dbOptions);
+		mongoose.connect(process.env.MONGODB_URI, dbOptions).then(r => { return r });
 		mongoose.set("useFindAndModify", false);
 		mongoose.Promise = global.Promise;
 
