@@ -1,6 +1,6 @@
 {
 	"guildID": "763859524351164436",
-	"prefix": "!",
+	"prefix": "b!",
 
 	"channels": {
 		"approvalQueue": "764935984986980363",
@@ -38,6 +38,21 @@
 		"android": "77dd77",
 		"ios": "b7aecf",
 		"marketing": "19B4E1"
+	},
+
+	"levels": {
+		"2": {
+			"role": "bugSquasher",
+			"response": ":star::star:Rank up!:star::star:\n:tada: Congratulations, you have achieved the rank of Bug Squasher!\n\nUnlocked: \n- Bug Hunter Bug Chat\n- Approval Queue"
+		},
+		"5": {
+			"role": "bugTracker",
+			"response": ":star::star:Rank up!:star::star:\n:tada: Congratulations, you have achieved the rank of Bug Tracker!\n\nUnlocked: \n- Discord Focus Test Priority Pass\n- Bug Hunter Badge (Green)"
+		},
+		"10": {
+			"role": "bugTerminator",
+			"response": ":star::star:Rank up!:star::star:\n:tada: Congratulations, you have achieved the rank of Bug Terminator!\n\nUnlocked: \n- Bug Hunter Badge (Gold)"
+		}
 	},
 
 	"emotes": {
