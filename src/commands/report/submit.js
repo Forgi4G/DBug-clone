@@ -1,5 +1,6 @@
 const Report = require("../../handlers/report");
 const Log = require("../../handlers/logging");
+const LocalFramework = require("../../utils/local-framework");
 
 module.exports = {
 	name: "submit",
@@ -7,8 +8,8 @@ module.exports = {
 	description: "Reports a bug",
 	roles: [],
 	run: async (client, message, args) => {
+		const localFramework = new LocalFramework({ listener: message });
 		message.delete({ timeout: 3000 });
-
 		let current = 0;
 
 		let title = "", steps = "", actual = "", expected = "", clientSettings = "", systemSettings = "";
@@ -52,7 +53,7 @@ module.exports = {
 
 		steps = steps.split("-");
 
-		Report.Send(
+		await Report.Send(
 			client,
 			message,
 			title,
@@ -68,10 +69,6 @@ module.exports = {
 			`💡 New bug report with the title \`\`${title}\`\` submitted by **${message.author.username}**#${message.author.discriminator} (${message.author.id})`
 		);
 
-		return message.reply(":tada:").catch(err => {
-        		if (err) return;
-    		}).then(msg => {
-        		if (msg) { msg.delete({ timeout: 3000 }).catch(err => { return err; }) }
-    		});
+		return localFramework.sendTempMSG(":tada:", 3000);
 	},
 };
