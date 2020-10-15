@@ -49,6 +49,40 @@ class LocalFramework {
             message.delete({ timeout: ms }).catch(err => { return err; })
         }
     }
+
+    /** Sends a ping to the author and avoids all errors
+     *
+     * @param input
+     */
+    sendReply(input) {
+        if (this.options.listener) {
+            let listener = this.options.listener;
+            listener.reply(input).catch(err => { return err; });
+        } else if (!this.options.listener) {
+            throw new Error("Missing an event listener");
+        } else if (!input) {
+            throw new Error("Missing input");
+        }
+    }
+
+    /** Sends a temporary reply, default time is 3 seconds
+     *
+     * @param input - Required input
+     * @param ms - Optional time in milliseconds
+     */
+    sendTempReply(input, ms) {
+        // Defaulting the timeout
+        if (!ms) { ms = 3000; }
+        if (this.options.listener) {
+            (this.options.listener).reply(input).catch(err => { return err; })
+                .then(m => { if (m) m.delete({ timeout: ms })
+                    .catch(err => { return err; })})
+        } else if (!this.options.listener) {
+            throw new Error("Missing an event listener");
+        } else if (!input) {
+            throw new Error("Missing input");
+        }
+    }
 }
 
 module.exports = LocalFramework;
