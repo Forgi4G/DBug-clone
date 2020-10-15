@@ -2,40 +2,20 @@ const Report = require("../../handlers/report");
 const Log = require("../../handlers/logging");
 const LocalFramework = require("../../utils/local-framework");
 
-const {
-	channels: { androidBugs, desktopBugs, marketingBugs, iosBugs },
-} = require("../../config");
-
-
 module.exports = {
 	name: "submit",
 	category: "report",
 	description: "Reports a bug",
 	roles: [],
 	run: async (client, message, args) => {
+		const { channels: { androidBugs, desktopBugs, marketingBugs, iosBugs } } = require("../../config");
 		const localFramework = new LocalFramework({ listener: message });
-		message.delete({ timeout: 3000 });
+		if (message.deletable) localFramework.deleteMSG(message);
 		let current = 0;
 
+		if (![androidBugs, desktopBugs, marketingBugs, iosBugs].includes(message.channel.id)) return localFramework.sendTempReply("This command can only be used in a bug report channel.");
 
 		let title = "", steps = "", actual = "", expected = "", clientSettings = "", systemSettings = "";
-
-		if (
-			![androidBugs, desktopBugs, marketingBugs, iosBugs].includes(
-				message.channel.id
-			)
-		)
-			return message
-				.reply("This command can only be used in a bug report channel")
-				.then((msg) => msg.delete({ timeout: 3000 }));
-
-		let title = "",
-			steps = "",
-			actual = "",
-			expected = "",
-			clientSettings = "",
-			systemSettings = "";
-
 
 		for (let i = 0; i < args.length; i++) {
 			switch (args[i]) {
@@ -74,23 +54,8 @@ module.exports = {
 			else if (current === 6) systemSettings += `${args[i]} `;
 		}
 
-
-		if (
-			[
-				!title,
-				!steps,
-				!actual,
-				!expected,
-				!clientSettings,
-				!systemSettings,
-			].includes(true)
-		)
-			return message
-				.reply(
-					"You must provide a title, steps to reproduce, actual result, expected result, client settings, and system settings. For assistance formatting your report, use <https://testersqts.github.io/bug-report-tool/>"
-				)
-				.then((msg) => msg.delete({ timeout: 3000 }));
-
+		if ([!title, !steps, !actual, !expected, !clientSettings, !systemSettings].includes(true))
+			return localFramework.sendTempReply("You must provide a title, steps to reproduce, actual result, expected result, client settings, and system settings. For assistance formatting your report, use <https://testersqts.github.io/bug-report-tool/>");
 
 		steps = steps.split("-");
 
