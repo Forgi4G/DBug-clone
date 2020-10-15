@@ -2,7 +2,20 @@ const Discord = require("discord.js");
 
 const DB = require("../handlers/database");
 const Report = require("../models/report");
-const { channels: { approvalQueue, desktopBugs, marketingBugs, androidBugs, deniedBugs, iosBugs }, colors, levels, roles, guildID } = require("../config");
+const {
+	channels: {
+		approvalQueue,
+		desktopBugs,
+		marketingBugs,
+		androidBugs,
+		deniedBugs,
+		iosBugs,
+	},
+	colors,
+	levels,
+	roles,
+	guildID,
+} = require("../config");
 const Log = require("./logging");
 
 module.exports = {
@@ -78,7 +91,7 @@ module.exports = {
 	},
 };
 
-function ApprovedBug(client, report, oEmbed) {
+async function ApprovedBug(client, report, oEmbed) {
 	console.log(`[+] Bug: ${report.title} got approved`);
 	let embed = new Discord.MessageEmbed()
 		.setColor(oEmbed.color)
@@ -93,6 +106,12 @@ function ApprovedBug(client, report, oEmbed) {
 		.setFooter(oEmbed.footer.text);
 
 	AddData(report, embed);
+
+	await client.users.fetch(report.userID).then((u) => {
+		u.send(`
+The bug you've reported has been approved! <https://www.youtube.com/watch?v=dQw4w9WgXcQ>
+		`);
+	});
 
 	client.channels.cache
 		.get(report.platform)
@@ -114,7 +133,7 @@ function ApprovedBug(client, report, oEmbed) {
 		.then((msg) => msg.delete());
 }
 
-function DeniedBug(client, report, oEmbed, content) {
+async function DeniedBug(client, report, oEmbed, content) {
 	console.log(`[-] Bug: ${report.title} got denied`);
 	let embed = new Discord.MessageEmbed()
 		.setColor(oEmbed.color)
@@ -129,6 +148,16 @@ function DeniedBug(client, report, oEmbed, content) {
 		.setFooter(oEmbed.footer.text);
 
 	AddData(report, embed);
+
+	await client.users.fetch(report.userID).then((u) => {
+		u.send(`
+Hey **${report.userTag}**, unfortunately your report ${
+			report.title
+		} has been denied for the following reasons:
+
+${report.denies.map((d) => `${d}\n`).join(" ")}
+		`);
+	});
 
 	client.channels.cache
 		.get(deniedBugs)
@@ -210,22 +239,34 @@ function PlatformColor(platform) {
 	return color;
 }
 
-async function grantRoles (user, client) {
+async function grantRoles(user, client) {
 	if (!user) return;
 	let reports = await Report.find({ userID: user, stance: "Approved" });
 
-	await client.guilds.cache.get(guildID).members.fetch(user).catch(() => {});
+	await client.guilds.cache
+		.get(guildID)
+		.members.fetch(user)
+		.catch(() => {});
 	let m = await client.guilds.cache.get(guildID).members.cache.get(user);
 	if (!m) return;
-	let level = levels[Object.keys(levels).filter(r => reports.length >= r).sort((a, b) => b - a)[0]];
+	let level =
+		levels[
+			Object.keys(levels)
+				.filter((r) => reports.length >= r)
+				.sort((a, b) => b - a)[0]
+		];
 	if (!level) return;
 	let roleId = roles[level.role];
-	let nonRoles = Object.values(levels).filter(r => r.role !== level.role && m.roles.cache.has(roles[r.role]));
+	let nonRoles = Object.values(levels).filter(
+		(r) => r.role !== level.role && m.roles.cache.has(roles[r.role])
+	);
 	if (roleId && !m.roles.cache.has(roleId)) {
 		await m.roles.add(roleId, `Reached ${level.role}`);
 		Log.Send(
 			client,
-			`⬆️ **${m.user.username}**#${m.user.discriminator} (${m.id}) achieved the rank of ${m.guild.roles.cache.get(roleId).name}`
+			`⬆️ **${m.user.username}**#${m.user.discriminator} (${
+				m.id
+			}) achieved the rank of ${m.guild.roles.cache.get(roleId).name}`
 		);
 		m.user.send(level.response).catch(() => {});
 	}
