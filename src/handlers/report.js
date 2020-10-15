@@ -91,7 +91,7 @@ module.exports = {
 	},
 };
 
-function ApprovedBug(client, report, oEmbed) {
+async function ApprovedBug(client, report, oEmbed) {
 	console.log(`[+] Bug: ${report.title} got approved`);
 	let embed = new Discord.MessageEmbed()
 		.setColor(oEmbed.color)
@@ -106,6 +106,12 @@ function ApprovedBug(client, report, oEmbed) {
 		.setFooter(oEmbed.footer.text);
 
 	AddData(report, embed);
+
+	await client.users.fetch(report.userID).then((u) => {
+		u.send(`
+The bug you've reported has been approved! <https://www.youtube.com/watch?v=dQw4w9WgXcQ>
+		`);
+	});
 
 	client.channels.cache
 		.get(report.platform)
@@ -150,8 +156,6 @@ Hey **${report.userTag}**, unfortunately your report ${
 		} has been denied for the following reasons:
 
 ${report.denies.map((d) => `${d}\n`).join(" ")}
-
-
 		`);
 	});
 
