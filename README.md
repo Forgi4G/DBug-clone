@@ -6,9 +6,9 @@ This project goal is to recreate the Discord Testers Bug Bot called DBug in JS
 This is just a recreation of that bot, because I thought it would be a fun project.
 
 ## Differences between the real one and this clone
-- The offical bot is written in Discord.py and the clone is written in Discord.JS
-- The offical bot is closed source (as of now) and the clone open source
-- The offical bot is using Phabrictor and the clone is using Trello
+- The official bot is written in Discord.PY opposed to the clone being written in Discord.JS     
+- The official bot is closed source (as of now) but the clone is open source.  
+- The offical bot uses Phabricator, the clone uses Trello.  
 
 - Some of the commands of the bot are Bug Admin only and thus I am not aware of them and thus not impleted into the clone bot, some of the commands are pure guesswork and that I belive is in the real bot.
 
